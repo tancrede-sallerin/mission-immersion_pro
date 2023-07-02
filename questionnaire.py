@@ -19,27 +19,37 @@
 #    - lancer()
 #
 
+
+import json
+
+
+
 class Question:
-    def __init__(self, titre, choix, bonne_reponse):
+    def __init__(self, titre, choix):
         self.titre = titre
         self.choix = choix
-        self.bonne_reponse = bonne_reponse
 
     def FromData(data):
         # ....
         q = Question(data[2], data[0], data[1])
         return q
 
-    def poser(self):
-        print("QUESTION")
+    def poser(self, n_question):
+        """poser() : affiche la question ainsi que les choix de réponses possibles. Elle demande ensuite à l'utilisateur
+         de saisir sa réponse et vérifie si la réponse est correcte en comparant la réponse de l'utilisateur avec la 
+         bonne réponse. La méthode retourne un booléen indiquant si la réponse est correcte ou non."""
+        print("QUESTION", n_question)
         print("  " + self.titre)
+        bonne_reponse = ""
         for i in range(len(self.choix)):
-            print("  ", i+1, "-", self.choix[i])
+            print("  ", i+1, "-", self.choix[i][0])  ##le premier des 2 éléments
+            if self.choix[i][1]:   # trouver la bonne réponse
+                bonne_reponse = self.choix[i][0]
 
         print()
         resultat_response_correcte = False
         reponse_int = Question.demander_reponse_numerique_utlisateur(1, len(self.choix))
-        if self.choix[reponse_int-1].lower() == self.bonne_reponse.lower():
+        if self.choix[reponse_int-1][0].lower() == bonne_reponse.lower():
             print("Bonne réponse")
             resultat_response_correcte = True
         else:
@@ -49,6 +59,8 @@ class Question:
         return resultat_response_correcte
 
     def demander_reponse_numerique_utlisateur(min, max):
+        '''Eviter les erreurs liées au réponses immpossibles : on ne veut que des nombres compris entre 1 et le 
+        nombre total de question'''
         reponse_str = input("Votre réponse (entre " + str(min) + " et " + str(max) + ") :")
         try:
             reponse_int = int(reponse_str)
@@ -66,34 +78,39 @@ class Questionnaire:
 
     def lancer(self):
         score = 0
+        compteur = 0
         for question in self.questions:
-            if question.poser():
+            compteur += 1
+            if question.poser(str(compteur)+"/"+str(len(self.questions))):
                 score += 1
         print("Score final :", score, "sur", len(self.questions))
         return score
 
 
-"""questionnaire = (
-    ("Quelle est la capitale de la France ?", ("Marseille", "Nice", "Paris", "Nantes", "Lille"), "Paris"), 
-    ("Quelle est la capitale de l'Italie ?", ("Rome", "Venise", "Pise", "Florence"), "Rome"),
-    ("Quelle est la capitale de la Belgique ?", ("Anvers", "Bruxelles", "Bruges", "Liège"), "Bruxelles")
-                )
-
-lancer_questionnaire(questionnaire)"""
-
-# q1 = Question("Quelle est la capitale de la France ?", ("Marseille", "Nice", "Paris", "Nantes", "Lille"), "Paris")
-# q1.poser()
-
-# data = (("Marseille", "Nice", "Paris", "Nantes", "Lille"), "Paris", "Quelle est la capitale de la France ?")
-# q = Question.FromData(data)
-# print(q.__dict__)
-
-Questionnaire(
+"""Questionnaire(
     (
     Question("Quelle est la capitale de la France ?", ("Marseille", "Nice", "Paris", "Nantes", "Lille"), "Paris"), 
     Question("Quelle est la capitale de l'Italie ?", ("Rome", "Venise", "Pise", "Florence"), "Rome"),
     Question("Quelle est la capitale de la Belgique ?", ("Anvers", "Bruxelles", "Bruges", "Liège"), "Bruxelles")
     )
-).lancer()
+).lancer()"""
+
+# On veut un tuple de questions
+
+def extraire_questions_du_fichier_json(chemin):
+    """Fonction qui récupère les questions du fichier json puis qui lance le questionnaire"""
+    with open(chemin) as f:
+        data = json.load(f) 
+    
+    print("\n"*3)  
+    print("*"*100)
+    print("Questionnnaire:", data['titre'], "- Catégorie:", data['categorie'], "- difficulté:", data['difficulte'])
+    print("*"*100, "\n")
+    questions_pretes = [Question(data['questions'][i]['titre'], data['questions'][i]['choix']) for i in range(10)]
+    return Questionnaire(questions_pretes).lancer()
+    
+
+extraire_questions_du_fichier_json(input("Donner un nom de fichier valide : "))
+
 
 
