@@ -113,7 +113,7 @@ def extraire_questions_du_fichier_json(chemin):
 
 # lancer le script
 # pour qu'il y ait bien 2 arguments quand on veut lancer le onm de notre script : questionnaire.py et le nom qu fichier json
-if len(sys.argv) > 2:
+if len(sys.argv) < 2:
     print("ERROR: vous devez spécifier le nom du fichier json à charger")
     exit(0)
 json_filename = sys.argv[1]
