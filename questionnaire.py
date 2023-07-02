@@ -21,6 +21,7 @@
 
 
 import json
+import sys  # pour passer le nom du questionnaire json en ligne de commande
 
 
 
@@ -89,9 +90,9 @@ class Questionnaire:
 
 """Questionnaire(
     (
-    Question("Quelle est la capitale de la France ?", ("Marseille", "Nice", "Paris", "Nantes", "Lille"), "Paris"), 
+    Question("Quelle est la capitale de la France ?", (("Marseille", False), "Nice", "Paris", "Nantes", "Lille")), 
     Question("Quelle est la capitale de l'Italie ?", ("Rome", "Venise", "Pise", "Florence"), "Rome"),
-    Question("Quelle est la capitale de la Belgique ?", ("Anvers", "Bruxelles", "Bruges", "Liège"), "Bruxelles")
+    Question("Quelle est la capitale de la Belgique ?", ("Anvers", "Bruxelles", "Bruges", "Liège"))
     )
 ).lancer()"""
 
@@ -110,7 +111,10 @@ def extraire_questions_du_fichier_json(chemin):
     return Questionnaire(questions_pretes).lancer()
     
 
-extraire_questions_du_fichier_json(input("Donner un nom de fichier valide : "))
-
-
-
+# lancer le script
+# pour qu'il y ait bien 2 arguments quand on veut lancer le onm de notre script : questionnaire.py et le nom qu fichier json
+if len(sys.argv) > 2:
+    print("ERROR: vous devez spécifier le nom du fichier json à charger")
+    exit(0)
+json_filename = sys.argv[1]
+extraire_questions_du_fichier_json(json_filename)
